@@ -15,7 +15,7 @@ const parsed = listMatchesQuerySchema.safeParse(req.query);
 if (!parsed.success) {
     return res.status(400).json({
         error: "Invalid query",
-        details: JSON.stringify(parsed.error),
+        details: parsed.error.issues,
     });
 }
 
@@ -43,20 +43,22 @@ matchRouter.post("/", async (req, res) => {
   if (!parsed.success) {
     return res.status(400).json({
       error: "Invalid payload",
-      details: JSON.stringify(parsed.error),
+      details: parsed.error.issues,
     });
   }
+
+  const {data: {startTime, endTime, homeScore, awayScore}} = parsed
 
   try {
     const [event] = await db
       .insert(matches)
       .values({
         ...parsed.data,
-        startTime: new Date(parsed.data.startTime),
-        endTime: new Date(parsed.data.endTime),
-        homeScore: parsed.data.homeScore ?? 0,
-        awayScore: parsed.data.awayScore ?? 0,
-        status: getMatchStatus(parsed.data.startTime, parsed.data.endTime),
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
+        homeScore: homeScore ?? 0,
+        awayScore: awayScore ?? 0,
+        status: getMatchStatus(startTime, endTime),
       })
       .returning();
 
