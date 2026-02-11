@@ -9,13 +9,11 @@ import {
   text,
 } from "drizzle-orm/pg-core";
 
-
 export const matchStatusEnum = pgEnum("match_status", [
   "scheduled",
   "live",
   "finished",
 ]);
-
 
 export const matches = pgTable("matches", {
   id: serial("id").primaryKey(),
@@ -29,7 +27,6 @@ export const matches = pgTable("matches", {
   awayScore: integer("away_score").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-
 
 export const commentary = pgTable("commentary", {
   id: serial("id").primaryKey(),
@@ -47,3 +44,7 @@ export const commentary = pgTable("commentary", {
   tags: varchar("tags", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+
+export type Match = typeof matches.$inferSelect;
+export type Commentary = typeof commentary.$inferSelect;
